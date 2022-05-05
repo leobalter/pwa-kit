@@ -87,10 +87,8 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
-                    console.log('child process exec Verdaccio child:', child)
-
                     const checkTime = 1000
-
+                    console.log('child process exec Verdaccio child:', child)
                     const waitForLogFileExists = () => {
                         console.log(
                             'LogFile: Wait for Verdaccio log file to exist logFileName:',
