@@ -87,23 +87,33 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
+                    console.log('child process exec Verdaccio child:', child)
+
+
+
                     const checkTime = 1000
 
                     const waitForLogFileExists = () => {
+
+                        console.log('LogFile: Wait for Verdaccio log file to exist logFileName:', logFileName)
                         setTimeout(() => {
                             fs.readFile(logFileName, (err) => {
                                 if (err) {
+                                    console.log('LogFile: Error reading log file error:', error)
                                     waitForLogFileExists()
                                 } else {
                                     const readStream = fs.createReadStream(logFileName)
-
+                                    console.log('LogFile: Log file exist read stream created readStream:',readStream )
                                     readStream.on('data', (data) => {
+                                        console.log('LogFile: Log file reading data:', data )
                                         if (data.includes('http address')) {
                                             // Verdaccio is running once it logs the HTTP address. Configure
                                             // NPM to use the local repo, through env vars.
                                             process.env['npm_config_registry'] =
                                                 'http://localhost:4873/'
                                             resolve()
+                                        }else{
+                                            console.log('LogFile: !!! Else without catch')
                                         }
                                     })
                                 }
