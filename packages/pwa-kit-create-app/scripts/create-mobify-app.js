@@ -36,7 +36,7 @@
 const p = require('path')
 const fs = require('fs')
 const os = require('os')
-const child_proc = require('child_process')
+// const child_proc = require('child_process')
 const {Command} = require('commander')
 const inquirer = require('inquirer')
 const {URL} = require('url')
@@ -204,25 +204,26 @@ const runGenerator = (answers, {outputDir, verbose}) => {
 
 const npmInstall = (outputDir, {verbose}) => {
     console.log('Installing dependencies... This may take a few minutes.\n')
-    const npmLogLevel = verbose ? 'notice' : 'error'
-    const disableStdOut = ['inherit', 'ignore', 'inherit']
-    const stdio = verbose ? 'inherit' : disableStdOut
-    try {
-        child_proc.execSync(`npm install --color always --loglevel ${npmLogLevel}`, {
-            cwd: outputDir,
-            stdio,
-            env: {
-                ...process.env,
-                OPENCOLLECTIVE_HIDE: 'true',
-                DISABLE_OPENCOLLECTIVE: 'true',
-                OPEN_SOURCE_CONTRIBUTOR: 'true'
-            }
-        })
-    } catch {
-        // error is already displayed on the console by child process.
-        // exit the program
-        process.exit(1)
-    }
+    // const npmLogLevel = verbose ? 'notice' : 'error'
+    // const disableStdOut = ['inherit', 'ignore', 'inherit']
+    // const stdio = verbose ? 'inherit' : disableStdOut
+    // try {
+    //     child_proc.execSync(`npm install --color always --loglevel ${npmLogLevel}`, {
+    //         cwd: outputDir,
+    //         stdio,
+    //         env: {
+    //             ...process.env,
+    //             OPENCOLLECTIVE_HIDE: 'true',
+    //             DISABLE_OPENCOLLECTIVE: 'true',
+    //             OPEN_SOURCE_CONTRIBUTOR: 'true'
+    //         }
+    //     })
+    // } catch {
+    //     // error is already displayed on the console by child process.
+    //     // exit the program
+    //     process.exit(1)
+    // }
+    console.log(`outputDir:${outputDir}, verbose:${verbose}`)
 }
 
 // Validations
