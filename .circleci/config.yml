@@ -286,6 +286,16 @@ jobs:
       - slack/status:
           fail_only: true
           only_for_branches: develop
+  generatedTemplateInstall:
+    docker:
+      - image: circleci/node:14-stretch-browsers
+    steps:
+      - checkout
+      - setup
+      - persist_to_workspace:
+          root: .
+          paths:
+            - '*'
   generatedTemplate:
     docker:
       - image: circleci/node:14-stretch-browsers
@@ -294,7 +304,8 @@ jobs:
         type: string
     steps:
       - checkout
-      - setup
+      - attach_workspace:
+          at: .
       - run:
           name: Generate << parameters.template >> project
           environment:
@@ -302,6 +313,18 @@ jobs:
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
             node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+  generatedTemplateInstallWindows:
+    executor:
+      name: win/default
+      size: "large"
+      shell: bash.exe
+    steps:
+      - checkout
+      - setup_windows
+      - persist_to_workspace:
+          root: .
+          paths:
+            - '*'
   generatedTemplateWindows:
     parameters:
       template:
@@ -312,7 +335,8 @@ jobs:
       shell: bash.exe
     steps:
       - checkout
-      - setup_windows
+      - attach_workspace:
+          at: .
       - run:
           name: Generate << parameters.template >> project
           environment:
@@ -343,14 +367,21 @@ workflows:
     jobs:
       - generatedSFCCProjectTest
       - generatedSFCCProjectTestWindows
+      - generatedTemplateInstall
       - generatedTemplate:
+          requires:
+            - generatedTemplateInstall
           matrix:
             parameters:
-              template: [express-minimal-test-project, typescript-minimal-test-project]
+              template: [ express-minimal-test-project, typescript-minimal-test-project ]
+      - generatedTemplateInstallWindows
       - generatedTemplateWindows:
+          requires:
+            - generatedTemplateInstallWindows
           matrix:
             parameters:
-              template: [express-minimal-test-project, typescript-minimal-test-project]
+              template: [ express-minimal-test-project, typescript-minimal-test-project ]
+
   nightly-build:
     triggers:
       - schedule:
@@ -374,13 +405,3 @@ workflows:
           context: nightly-build
       - generatedSFCCProjectTestWindows:
           context: nightly-build
-      - generatedTemplate:
-          context: nightly-build
-          matrix:
-            parameters:
-              template: [ express-minimal-test-project, typescript-minimal-test-project ]
-      - generatedTemplateWindows:
-          context: nightly-build
-          matrix:
-            parameters:
-              template: [ express-minimal-test-project, typescript-minimal-test-project ]
