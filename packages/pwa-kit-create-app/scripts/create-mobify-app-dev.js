@@ -87,7 +87,7 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
-                    const checkTime = 1000
+                    const CHECK_TIME = 1000
                     console.log('child process exec Verdaccio child:', child)
                     const waitForLogFileExists = () => {
                         console.log(
@@ -113,6 +113,8 @@ const withLocalNPMRepo = (func) => {
                                             process.env['npm_config_registry'] =
                                                 'http://localhost:4873/'
                                             resolve()
+                                        }else{
+                                            console.log('LogFile: else data:', data)
                                         }
                                     })
 
@@ -122,7 +124,7 @@ const withLocalNPMRepo = (func) => {
                                     })
                                 }
                             })
-                        }, checkTime)
+                        }, CHECK_TIME)
                     }
                     waitForLogFileExists()
                 })
