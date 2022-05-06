@@ -343,11 +343,11 @@ workflows:
       - generatedTemplate:
           matrix:
             parameters:
-              template: [ express-minimal-test-project, typescript-minimal-test-project, test-project, retail-react-app-demo ]
+              template: [ express-minimal-test-project, typescript-minimal-test-project, test-project, retail-react-app-demo, test-project, retail-react-app-demo ]
       - generatedTemplateWindows:
           matrix:
             parameters:
-              template: [ express-minimal-test-project, typescript-minimal-test-project, test-project, retail-react-app-demo ]
+              template: [ express-minimal-test-project, typescript-minimal-test-project, test-project, retail-react-app-demo, test-project, retail-react-app-demo ]
   nightly-build:
     triggers:
       - schedule:
