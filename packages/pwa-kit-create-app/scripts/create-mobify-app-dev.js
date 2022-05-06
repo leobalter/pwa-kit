@@ -87,67 +87,32 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
-                    const CHECK_DELAY = 2000
-                    let atempCount = 0
-                    console.log('LogFile: child process exec Verdaccio child:', child)
+                    const checkTime = 1000
+
                     const waitForLogFileExists = () => {
-                        atempCount++
-                        console.log('LogFile: tempCount:', atempCount)
-                        if(atempCount>5){
-                            resolve()
-                        }
-                        console.log(
-                            'LogFile: Wait for Verdaccio log file to exist logFileName:',
-                            logFileName
-                        )
                         setTimeout(() => {
-                            fs.readFile(logFileName, (err, data) => {
+                            fs.readFile(logFileName, 'utf8', (err, data) => {
                                 if (err) {
-                                    console.log('LogFile: Error reading log file error:', err)
                                     waitForLogFileExists()
                                 } else {
-
-                                    console.log(
-                                        'LogFile: Log file exist read stream created data:',
-                                        data
-                                    )
-
-
-
-                                    const readStream = fs.createReadStream(logFileName)
-                                    console.log(
-                                        'LogFile: Log file exist read stream created readStream:',
-                                        readStream
-                                    )
-
-                                    readStream.on('error', (err) => {
-                                        console.log(
-                                            'LogFile: Error reading Verdaccio log file:',
-                                            err.message
-                                        )
-                                        //waitForLogFileExists()
-                                    })
+                                    console.log('LogFile: Log file reading data:', data)
+                                    const readStream = fs.createReadStream(logFileName, 'utf8')
 
                                     readStream.on('data', (data) => {
-                                        console.log('LogFile: Log file reading data:', data)
                                         if (data.includes('http address')) {
                                             // Verdaccio is running once it logs the HTTP address. Configure
                                             // NPM to use the local repo, through env vars.
                                             process.env['npm_config_registry'] =
                                                 'http://localhost:4873/'
                                             resolve()
-                                        } else {
-                                            console.log('LogFile: else data:', data)
-                                            //waitForLogFileExists()
                                         }
                                     })
                                 }
                             })
-                        }, CHECK_DELAY)
+                        }, checkTime)
                     }
-                    console.log('LogFile: before waitForLogFileExists')
+
                     waitForLogFileExists()
-                    console.log('LogFile: after waitForLogFileExists')
                 })
         )
         .then(() => {
