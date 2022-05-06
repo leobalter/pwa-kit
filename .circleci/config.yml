@@ -173,29 +173,13 @@ commands:
             GENERATOR_PRESET: 'test-project'
           command: |
             set GENERATOR_PRESET=test-project
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
-            
-            cd generated-project
-            npm run build
-      - runtests:
-          cwd: generated-project
-      - smoketestscripts:
-          dir: generated-project
-      - run:
-          name: Count Generated Project Dependencies
-          environment:
-          command: |
-            MAX_PACKAGES="2250"
-            total=$(./scripts/count-dependencies.js generated-project)
-            echo "export TOTAL_PACKAGES=${total}" >> $BASH_ENV;
-            source $BASH_ENV
+            NODE_DEBUG=cluster,net,fs,module,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
 
-            if [ "$total" -gt "$MAX_PACKAGES" ]; then
-                echo "Error: Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
-                exit 1;
-            else
-                echo "Found $TOTAL_PACKAGES installed packages (max $MAX_PACKAGES).";
-            fi
+  save_verdaccio_log_as_artifacts:
+    steps:
+      - store_artifacts:
+          path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
+          destination: verdaccio
 
   early_return_for_forked_pull_requests:
     description: >-
@@ -320,7 +304,8 @@ jobs:
             GENERATOR_PRESET: << parameters.template >>
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+            NODE_DEBUG=cluster,net,fs,module,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+      - save_verdaccio_log_as_artifacts
   generatedTemplateWindows:
     parameters:
       template:
@@ -338,7 +323,8 @@ jobs:
             GENERATOR_PRESET: << parameters.template >>
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
-            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+            NODE_DEBUG=cluster,net,fs,module,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+      - save_verdaccio_log_as_artifacts
   generatedSFCCProjectTest:
     docker:
       - image: circleci/node:14-stretch-browsers
@@ -346,56 +332,8 @@ jobs:
       - checkout
       - setup
       - generate_and_test_project
+      - save_verdaccio_log_as_artifacts
 
-      - early_return_for_forked_pull_requests
-      - slack/status:
-          fail_only: true
-          only_for_branches: develop
-      - run:
-          name: Audit Generated Project
-          environment:
-          command: |
-            # This is the *most* important audit step, much more than the
-            # "whole monorepo" one above - bear in mind that SDK users probably
-            # don't care if eg. our docs site uses a vulnerable dependency.
-            #
-            # Treat failures here seriously and try to fix them before just bumping
-            # thresholds. These vulnerabilities create a really bad impression with our
-            # users during sales or in the early stages of a project.
-            #
-            # REMINDER: Have you bumped up our alpha versions? If you recently fixed some
-            # vulnerabilities, you will need to increment the alpha versions (so that
-            # publishing them to the local npm repo would be successful).
-
-            if [[ "${CIRCLE_BRANCH}" == "develop" ]]; then
-              # Run snyk auth - authenticate snyk using environment variables to add the token
-              snyk auth $SNYK_TOKEN
-
-              snyk monitor --ignore-policy --remote-repo-url='https://github.com/SalesforceCommerceCloud/pwa-kit.git' --project-name='generated-scaffold-pwa'
-            fi
-      - run:
-          name: Send metrics to Datadog
-          environment:
-          command: |
-            # Add a dogrc so we can submit metrics to datadog
-            printf "[Connection]\napikey = $DATADOG_API_KEY\nappkey =\n" > ~/.dogrc
-
-            dog metric post mobify_platform_sdks.generated_project_total_packages $TOTAL_PACKAGES
-      - run:
-          name: Push Bundle
-          command: |
-            if [[ $DEVELOP ]]; then
-              target='generated-pwa'
-            else
-              target=""
-            fi
-
-            project="scaffold-pwa"
-
-            if [[ $target ]]; then
-              cd generated-project
-              npm run push -- -s $project --message "Generated PWA build ${CIRCLE_BUILD_NUM} on ${CIRCLE_BRANCH} (${CIRCLE_SHA1})" --target $target
-            fi
   generatedSFCCProjectTestWindows:
     executor:
       name: win/default
@@ -405,25 +343,21 @@ jobs:
       - checkout
       - setup_windows
       - generate_and_test_project
+      - save_verdaccio_log_as_artifacts
 workflows:
   version: 2
   test:
     jobs:
-      - testNode12
-      - testNode14
-      - testNode14Windows
-      - testNode14npm7
-      - testNode14npm8
       - generatedSFCCProjectTest
       - generatedSFCCProjectTestWindows
       - generatedTemplate:
           matrix:
             parameters:
-              template: [express-minimal-test-project, typescript-minimal-test-project]
+              template: [ express-minimal-test-project, typescript-minimal-test-project, test-project, retail-react-app-demo ]
       - generatedTemplateWindows:
           matrix:
             parameters:
-              template: [express-minimal-test-project, typescript-minimal-test-project]
+              template: [ express-minimal-test-project, typescript-minimal-test-project, test-project, retail-react-app-demo ]
   nightly-build:
     triggers:
       - schedule:
@@ -451,9 +385,9 @@ workflows:
           context: nightly-build
           matrix:
             parameters:
-              template: [ express-minimal-test-project, typescript-minimal-test-project ]
+              template: [ express-minimal-test-project, typescript-minimal-test-project, test-project, retail-react-app-demo ]
       - generatedTemplateWindows:
           context: nightly-build
           matrix:
             parameters:
-              template: [ express-minimal-test-project, typescript-minimal-test-project ]
+              template: [ express-minimal-test-project, typescript-minimal-test-project, test-project, retail-react-app-demo ]
