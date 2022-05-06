@@ -115,13 +115,14 @@ const withLocalNPMRepo = (func) => {
                                             resolve()
                                         } else {
                                             console.log('LogFile: else data:', data)
+                                            waitForLogFileExists()
                                         }
                                     })
 
                                     readStream.on('error', (err) => {
                                         console.log('LogFile: ERROR READING err:', err)
 
-                                        // waitForLogFileExists()
+                                        waitForLogFileExists()
                                     })
                                 }
                             })
