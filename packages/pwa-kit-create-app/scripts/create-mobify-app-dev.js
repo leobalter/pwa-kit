@@ -101,7 +101,7 @@ const withLocalNPMRepo = (func) => {
                                     waitForLogFileExists()
                                 } else {
                                     console.log(
-                                        'LogFile: Log file exist read stream created readStream:',
+                                        'LogFile: Log file exist read stream created data:',
                                         data
                                     )
 
