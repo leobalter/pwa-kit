@@ -175,6 +175,12 @@ commands:
             set GENERATOR_PRESET=test-project
             NODE_DEBUG=cluster,net,fs,module,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
 
+  save_verdaccio_log_as_artifacts:
+    steps:
+      - store_artifacts:
+          path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
+          destination: verdaccio
+
   early_return_for_forked_pull_requests:
     description: >-
       If this build is from a fork, stop executing the current job and return success.
@@ -299,6 +305,7 @@ jobs:
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
             NODE_DEBUG=cluster,net,fs,module,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+      - save_verdaccio_log_as_artifacts
   generatedTemplateWindows:
     parameters:
       template:
@@ -317,6 +324,7 @@ jobs:
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
             NODE_DEBUG=cluster,net,fs,module,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+      - save_verdaccio_log_as_artifacts
   generatedSFCCProjectTest:
     docker:
       - image: circleci/node:14-stretch-browsers
@@ -324,6 +332,7 @@ jobs:
       - checkout
       - setup
       - generate_and_test_project
+      - save_verdaccio_log_as_artifacts
 
   generatedSFCCProjectTestWindows:
     executor:
@@ -334,6 +343,7 @@ jobs:
       - checkout
       - setup_windows
       - generate_and_test_project
+      - save_verdaccio_log_as_artifacts
 workflows:
   version: 2
   test:

@@ -95,16 +95,22 @@ const withLocalNPMRepo = (func) => {
                             logFileName
                         )
                         setTimeout(() => {
-                            fs.readFile(logFileName, (err) => {
+                            fs.readFile(logFileName, 'utf8', (err, data) => {
                                 if (err) {
                                     console.log('LogFile: Error reading log file error:', err)
                                     waitForLogFileExists()
                                 } else {
+                                    console.log(
+                                        'LogFile: Log file exist read stream created readStream:',
+                                        data
+                                    )
+
                                     const readStream = fs.createReadStream(logFileName, 'utf8')
                                     console.log(
                                         'LogFile: Log file exist read stream created readStream:',
                                         readStream
                                     )
+
                                     readStream.on('error', (err) => {
                                         console.log(
                                             'LogFile: Error reading Verdaccio log file:',
