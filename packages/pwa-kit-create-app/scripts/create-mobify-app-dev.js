@@ -113,13 +113,14 @@ const withLocalNPMRepo = (func) => {
                                             process.env['npm_config_registry'] =
                                                 'http://localhost:4873/'
                                             resolve()
-                                        }else{
+                                        } else {
                                             console.log('LogFile: else data:', data)
                                         }
                                     })
 
-                                    readStream.on('error',(err)=>{
+                                    readStream.on('error', (err) => {
                                         console.log('LogFile: ERROR READING err:', err)
+
                                         // waitForLogFileExists()
                                     })
                                 }
