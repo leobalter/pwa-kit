@@ -87,7 +87,7 @@ const withLocalNPMRepo = (func) => {
                         }
                     })
 
-                    const CHECK_TIME = 1000
+                    const CHECK_DELAY = 2000
                     console.log('child process exec Verdaccio child:', child)
                     const waitForLogFileExists = () => {
                         console.log(
@@ -105,6 +105,14 @@ const withLocalNPMRepo = (func) => {
                                         'LogFile: Log file exist read stream created readStream:',
                                         readStream
                                     )
+
+                                    // ##
+                                    readStream.on('error', (err) => {
+                                        console.log('LogFile: ERROR READING err:', err)
+                                        // console.log('LogFile: ERROR READING err:', err)
+                                        waitForLogFileExists()
+                                    })
+
                                     readStream.on('data', (data) => {
                                         console.log('LogFile: Log file reading data:', data)
                                         if (data.includes('http address')) {
@@ -119,14 +127,10 @@ const withLocalNPMRepo = (func) => {
                                         }
                                     })
 
-                                    readStream.on('error', (err) => {
-                                        console.log('LogFile: ERROR READING err:', err)
-                                        // console.log('LogFile: ERROR READING err:', err)
-                                        waitForLogFileExists()
-                                    })
+
                                 }
                             })
-                        }, CHECK_TIME)
+                        }, CHECK_DELAY)
                     }
                     waitForLogFileExists()
                 })

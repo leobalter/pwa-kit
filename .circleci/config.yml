@@ -375,9 +375,9 @@ workflows:
           context: nightly-build
           matrix:
             parameters:
-              template: [ express-minimal-test-project, typescript-minimal-test-project ]
+              template: [ express-minimal-test-project, typescript-minimal-test-project, test-project, retail-react-app-demo ]
       - generatedTemplateWindows:
           context: nightly-build
           matrix:
             parameters:
-              template: [ express-minimal-test-project, typescript-minimal-test-project ]
+              template: [ express-minimal-test-project, typescript-minimal-test-project, test-project, retail-react-app-demo ]
