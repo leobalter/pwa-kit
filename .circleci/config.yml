@@ -173,7 +173,7 @@ commands:
             GENERATOR_PRESET: 'test-project'
           command: |
             set GENERATOR_PRESET=test-project
-            NODE_DEBUG=fs,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
+            NODE_DEBUG=cluster,net,fs,module,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
 
   early_return_for_forked_pull_requests:
     description: >-
@@ -298,7 +298,7 @@ jobs:
             GENERATOR_PRESET: << parameters.template >>
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
-            NODE_DEBUG=fs,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+            NODE_DEBUG=cluster,net,fs,module,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
   generatedTemplateWindows:
     parameters:
       template:
@@ -316,7 +316,7 @@ jobs:
             GENERATOR_PRESET: << parameters.template >>
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
-            NODE_DEBUG=fs,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+            NODE_DEBUG=cluster,net,fs,module,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
   generatedSFCCProjectTest:
     docker:
       - image: circleci/node:14-stretch-browsers
