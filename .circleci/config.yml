@@ -173,13 +173,13 @@ commands:
             GENERATOR_PRESET: 'test-project'
           command: |
             set GENERATOR_PRESET=test-project
-            NODE_DEBUG=fs,module,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-project
 
   save_verdaccio_log_as_artifacts:
     steps:
       - store_artifacts:
           path: packages/pwa-kit-create-app/local-npm-repo/verdaccio.log
-          destination: verdaccio
+          destination: verdaccio/verdaccio.log
 
   early_return_for_forked_pull_requests:
     description: >-
@@ -304,7 +304,7 @@ jobs:
             GENERATOR_PRESET: << parameters.template >>
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
-            NODE_DEBUG=fs,module,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
       - save_verdaccio_log_as_artifacts
   generatedTemplateWindows:
     parameters:
@@ -323,7 +323,7 @@ jobs:
             GENERATOR_PRESET: << parameters.template >>
           command: |
             set GENERATOR_PRESET=<< parameters.template >>
-            NODE_DEBUG=fs,module,timers node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
+            node packages/pwa-kit-create-app/scripts/create-mobify-app-dev.js --outputDir generated-<< parameters.template >>
       - save_verdaccio_log_as_artifacts
   generatedSFCCProjectTest:
     docker:
