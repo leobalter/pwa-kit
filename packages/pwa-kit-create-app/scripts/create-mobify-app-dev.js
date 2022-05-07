@@ -91,12 +91,12 @@ const withLocalNPMRepo = (func) => {
 
                     const waitForLogFileExists = () => {
                         setTimeout(() => {
-                            fs.readFile(logFileName, 'utf8', (err, data) => {
+                            fs.readFile(logFileName, (err) => {
                                 if (err) {
                                     waitForLogFileExists()
                                 } else {
-                                    console.log('LogFile: Log file reading data:', data)
-                                    const readStream = fs.createReadStream(logFileName, 'utf8')
+                                    console.log('LogFile: exists')
+                                    const readStream = fs.createReadStream(logFileName)
 
                                     readStream.on('data', (data) => {
                                         if (data.includes('http address')) {
